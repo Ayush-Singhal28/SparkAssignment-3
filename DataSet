@@ -1,0 +1,37 @@
+scala> import spark.implicits._
+import spark.implicits._
+
+scala> case class Football(HomeTeam: String, AwayTeam: String, FTHG: Int, FTAG: Int, FTR:String)
+defined class Football
+
+scala> read.map(x => Football(x.getString(2),x.getString(3),x.getInt(4),x.getInt(5),x.getString(6)))
+res0: org.apache.spark.sql.Dataset[Football] = [HomeTeam: string, AwayTeam: string ... 3 more fields]
+
+scala> read.map(x => Football(x.getString(2),x.getString(3),x.getInt(4),x.getInt(5),x.getString(6))).show
+18/02/28 10:25:58 WARN Utils: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 'spark.debug.maxToStringFields' in SparkEnv.conf.
++-------------+-------------+----+----+---+
+|     HomeTeam|     AwayTeam|FTHG|FTAG|FTR|
++-------------+-------------+----+----+---+
+|Bayern Munich|Werder Bremen|   6|   0|  H|
+|     Augsburg|    Wolfsburg|   0|   2|  A|
+|     Dortmund|        Mainz|   2|   1|  H|
+|Ein Frankfurt|   Schalke 04|   1|   0|  H|
+|      FC Koln|    Darmstadt|   2|   0|  H|
+|      Hamburg|   Ingolstadt|   1|   1|  D|
+|   M'gladbach|   Leverkusen|   2|   1|  H|
+|       Hertha|     Freiburg|   2|   1|  H|
+|   Hoffenheim|   RB Leipzig|   2|   2|  D|
+|   Schalke 04|Bayern Munich|   0|   2|  A|
+|    Darmstadt|Ein Frankfurt|   1|   0|  H|
+|     Freiburg|   M'gladbach|   3|   1|  H|
+|   Ingolstadt|       Hertha|   0|   2|  A|
+|   Leverkusen|      Hamburg|   3|   1|  H|
+|   RB Leipzig|     Dortmund|   1|   0|  H|
+|    Wolfsburg|      FC Koln|   0|   0|  D|
+|        Mainz|   Hoffenheim|   4|   4|  D|
+|Werder Bremen|     Augsburg|   1|   2|  A|
+|      FC Koln|     Freiburg|   3|   0|  H|
+|Bayern Munich|   Ingolstadt|   3|   1|  H|
++-------------+-------------+----+----+---+
+only showing top 20 rows
+

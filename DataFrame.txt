@@ -1,0 +1,77 @@
+
+scala> val path = "/home/knoldus/Desktop/D1.csv"
+path: String = /home/knoldus/Desktop/D1.csv
+
+scala> val read = spark.read.option("header","true").option("inferSchema","true").csv(path)
+read: org.apache.spark.sql.DataFrame = [Div: string, Date: string ... 62 more fields]
+
+scala> read.createOrReplaceTempView("FootballTeam")
+
+scala> spark.sql("select HomeTeam As Team,count(FTR) As Winning from FootballTeam where (FTR = 'H') group By(HomeTeam)").show
+18/02/28 10:15:13 WARN Utils: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 'spark.debug.maxToStringFields' in SparkEnv.conf.
++-------------+-------+                                                         
+|         Team|Winning|
++-------------+-------+
+|        Mainz|      7|
+|   Schalke 04|      8|
+|   Hoffenheim|     11|
+|    Darmstadt|      6|
+|   RB Leipzig|     12|
+|Werder Bremen|      8|
+|       Hertha|     12|
+|   Leverkusen|      5|
+|      FC Koln|      9|
+|     Freiburg|     10|
+|Ein Frankfurt|      7|
+|      Hamburg|      8|
+|    Wolfsburg|      5|
+|   Ingolstadt|      4|
+|   M'gladbach|      7|
+|Bayern Munich|     13|
+|     Augsburg|      5|
+|     Dortmund|     13|
++-------------+-------+
+
+
+scala> :paste
+// Entering paste mode (ctrl-D to finish)
+
+
+spark.sql(
+      """
+      select Team, (sum(Winning) / 34) * 100
+      from
+      (
+      select HomeTeam As Team,count(FTR) As Winning from FootballTeam where (FTR = 'H') group By(HomeTeam)
+      Union
+      select AwayTeam As Team,count(FTR) As Winning from FootballTeam where (FTR = 'A') group By(AwayTeam)
+      )
+      group By(Team)
+      """
+      ).show
+
+// Exiting paste mode, now interpreting.
+
++-------------+---------------------------------------------------------------------------+
+|         Team|((CAST(sum(Winning) AS DOUBLE) / CAST(34 AS DOUBLE)) * CAST(100 AS DOUBLE))|
++-------------+---------------------------------------------------------------------------+
+|        Mainz|                                                         29.411764705882355|
+|   Schalke 04|                                                          32.35294117647059|
+|   Hoffenheim|                                                          47.05882352941176|
+|    Darmstadt|                                                         20.588235294117645|
+|   RB Leipzig|                                                          58.82352941176471|
+|Werder Bremen|                                                          38.23529411764706|
+|       Hertha|                                                          44.11764705882353|
+|   Leverkusen|                                                          32.35294117647059|
+|      FC Koln|                                                         35.294117647058826|
+|     Freiburg|                                                          41.17647058823529|
+|Ein Frankfurt|                                                          32.35294117647059|
+|      Hamburg|                                                         29.411764705882355|
+|    Wolfsburg|                                                         14.705882352941178|
+|   Ingolstadt|                                                          11.76470588235294|
+|   M'gladbach|                                                         35.294117647058826|
+|Bayern Munich|                                                          73.52941176470588|
+|     Augsburg|                                                          26.47058823529412|
+|     Dortmund|                                                          52.94117647058824|
++-------------+---------------------------------------------------------------------------+
+
